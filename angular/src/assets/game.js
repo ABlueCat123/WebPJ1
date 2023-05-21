@@ -1,4 +1,5 @@
-class Game {
+import("../assets/libs/FBXLoader.js")
+var game=class Game {
     constructor(choice) {
         if (!Detector.webgl) Detector.addGetWebGLMessage();
         this.modes = Object.freeze({

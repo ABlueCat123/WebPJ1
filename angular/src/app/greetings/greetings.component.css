@@ -1,0 +1,68 @@
+
+
+.title{
+  z-index: 1;
+  height: 15em;
+}
+
+h1{
+  font-family:'Kristen ITC',sans-serif;
+  font-size: 5em;
+  line-height: 1.5em;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  color: #ffcb24;
+  text-shadow: 0 0 .1em, 0 0 .3em;
+  transition: all 1s;
+}
+h2{
+  font-family:'Kristen ITC',sans-serif;
+  font-size: 4em;
+  line-height: 1.5em;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  color: #ffa132;
+  text-shadow: 0 0 .1em, 0 0 .3em;
+  transition: all 1s;
+  position: relative;
+}
+
+.img-box{
+  position: relative;
+  z-index: -1;
+  right: 20%;
+  bottom: 300px;
+}
+img{
+  height: 100%;
+  width: 300px;
+}
+#run-icon{
+  transform: rotateY(180deg);
+  height: 1.5em;
+  width: 1.5em;
+  margin-bottom: -10px;
+  vertical-align: center;
+}
+button#start{
+  all: unset;
+  color: #ffffff;
+  font-family: 'Arial', monospace;
+  font-weight: 900;
+  font-size: 2em;
+  height: 1.5em;
+  padding: .25em;
+  width: fit-content;
+}
+
+#start:hover {
+  text-shadow: 0 0 .1em;
+  stroke: white;
+  stroke-width: 2em;
+  stroke-opacity: 0.3;
+  transition:all .2s;
+  cursor: pointer;
+}
+

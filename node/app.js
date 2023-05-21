@@ -4,6 +4,7 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 app.use(express.static('./blockland/'));
+//使用了blockland目录下的静态资源（前端。）
 app.use(express.static('./libs'));
 
 io.sockets.on('connection', function(socket){
