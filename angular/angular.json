@@ -28,7 +28,14 @@
               "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/js/toon3d.js",
+              "src/assets/js/three.js",
+              "src/assets/js/inflate.min.js",
+              "src/assets/js/FBXLoader.js",
+              "src/assets/js/Panel.js",
+              "src/assets/js/Game.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -92,7 +99,6 @@
               "src/styles.css"
             ],
             "scripts": [
-              "@assets/game.js"
             ]
           }
         }
