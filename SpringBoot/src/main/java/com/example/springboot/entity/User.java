@@ -18,7 +18,4 @@ public class User {
     @Column(nullable = false,length = 16)
     private String password;
 
-    @OneToMany(targetEntity = Record.class,fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @OrderBy("startTime ASC")
-    private List<Record> records;
 }

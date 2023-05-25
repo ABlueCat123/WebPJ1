@@ -1,5 +1,6 @@
 package com.example.springboot.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,13 +16,15 @@ public class Record {
     private Long recordId;
 
     // 对局玩家1 可以直接规定玩家一就是警察身份 玩家二就是小偷身份 这样可以减少后端user类需要存储的属性
-    @ManyToOne(fetch = FetchType.LAZY,targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.LAZY,targetEntity = User.class,cascade = CascadeType.ALL)
     @JoinColumn(name = "police")
+    @JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
     private User police;
 
     // 对局玩家2
-    @ManyToOne(fetch = FetchType.LAZY,targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.LAZY,targetEntity = User.class,cascade = CascadeType.ALL)
     @JoinColumn(name = "thief")
+    @JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
     private User thief;
 
     // 对局开始的时间

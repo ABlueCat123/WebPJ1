@@ -1,5 +1,6 @@
 package com.example.springboot.controller;
 
+import com.example.springboot.entity.Record;
 import com.example.springboot.entity.User;
 import com.example.springboot.service.UserService;
 import jakarta.annotation.Resource;
@@ -7,6 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -17,7 +21,8 @@ public class UserController {
     @ResponseBody
     public Boolean login(@Param("username")String username, @Param("password") String password, HttpServletRequest httpServletRequest) throws Exception{
         if (userService.check(username,password)) {
-            httpServletRequest.getSession().setAttribute("user", userService.findUserByUsername(username));
+            User user = userService.findUserByUsername(username);
+            httpServletRequest.getSession().setAttribute("user", user);
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
@@ -26,6 +31,7 @@ public class UserController {
     @GetMapping("/logout")
     @ResponseBody
     public Boolean logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception{
+//        System.out.println(httpServletRequest.getSession().getAttribute("user"));
         httpServletRequest.getSession().removeAttribute("user");
 //        httpServletResponse.sendRedirect("login");
         return Boolean.TRUE;
