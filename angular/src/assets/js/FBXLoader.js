@@ -45,9 +45,7 @@ THREE.FBXLoader = ( function () {
 
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
-      console.log("Inside load")
       loader.load( url, function ( buffer ) {
-        console.log("Inside load : load")
 
 				try {
 

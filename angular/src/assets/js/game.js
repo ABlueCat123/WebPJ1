@@ -52,7 +52,6 @@ class Game {
   }
 
   init(choice) {
-    console.log("Running init")
     this.mode = this.modes.INITIALISING;
     // scene and lighting
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 200000);
@@ -79,18 +78,12 @@ class Game {
     const game = this;
     // const people = ['BeachBabe', 'BusinessMan', 'Doctor', 'FireFighter', 'Housewife', 'Policeman', 'Prostitute', 'Punk', 'RiotCop', 'Roadworker', 'Robber', 'Sheriff', 'Streetman', 'Waitress'];
     const people = ['Policeman', 'Robber'];
-    // let model = people[Math.floor(Math.random() * people.length)];
     let model;
-    if (choice === 'police')
+    if (choice === 'policeman')
       model = people[0]
-    else
-      // if (choice === 'thief')
+    else //thief
       model = people[1];
-    console.log(model)
-    console.log("Inside load5")
-    console.log("path:"+`${this.assetsPath}/fbx/people/${model}.fbx`);
     loader.load(`${this.assetsPath}/fbx/people/${model}.fbx`, function (object) {
-      console.log("Inside load6 (load failure)")
       game.player.root = object;
       object.mixer = new THREE.AnimationMixer(game.player.root);
       game.player.mixer = object.mixer;
@@ -119,7 +112,6 @@ class Game {
       });
 
       game.player.object = new THREE.Object3D();
-      console.log(game.player.object)
 
       game.player.object.position.set(-1000, 0, -1000);
 
@@ -132,11 +124,8 @@ class Game {
         onMove: game.playerControl,
         game: game
       })
-      console.log("Before cam")
       game.createCameras();
-      console.log("Before env")
       game.loadEnvironment(loader);
-      console.log("quitting load")
     });
 
     // window renderer
@@ -227,7 +216,6 @@ class Game {
     collect.parent = this.player.object;
     this.player.cameras = {front, back, wide, overhead, collect};
     this.activeCamera = this.player.cameras.back;
-    console.log("In cam3")
   }
 
 

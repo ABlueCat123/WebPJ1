@@ -53,10 +53,13 @@ li:first-child{
   color: rgb(255, 225, 0);
   font-size: 1.25em;
 }
+
 li:hover{
   text-shadow: 0 0 .1em , 0 0 .3em ,0 0 .5em;
   cursor: pointer;
 }
+
+
 #backlink{
   height: 4em;
   position: absolute;
@@ -69,4 +72,16 @@ li:hover{
   stroke-opacity: 0.3;
   stroke-width: 3em;
   cursor: pointer;
+}
+
+.--disabled{
+  text-shadow: 0 0 .1em;
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+.--disabled:hover{
+  text-shadow: 0 0 .1em;
+  cursor: not-allowed;
+  color: #ccc;
 }
