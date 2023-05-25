@@ -18,6 +18,8 @@ import {ChooseRoomComponent} from './choose-room/choose-room.component';
 import {ChooseCharacterComponent} from './choose-character/choose-character.component';
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 import { ThreeDComponent } from './three-d/three-d.component';
+import { ChatComponent } from './chat/chat.component';
+import { LogoutComponent } from './logout/logout.component';
 
 const appRoutes: Routes = [
   {path: '', component: GreetingsComponent},
@@ -47,6 +49,8 @@ const appRoutes: Routes = [
     ChooseRoomComponent,
     ChooseCharacterComponent,
     ThreeDComponent,
+    ChatComponent,
+    LogoutComponent,
   ],
   imports: [
     RouterModule.forRoot(appRoutes, {enableTracing: true}),
