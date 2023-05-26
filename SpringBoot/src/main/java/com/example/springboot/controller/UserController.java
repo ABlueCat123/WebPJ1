@@ -17,9 +17,11 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    @PostMapping("/login")
+    @GetMapping("/login")
     @ResponseBody
     public Boolean login(@Param("username")String username, @Param("password") String password, HttpServletRequest httpServletRequest) throws Exception{
+        System.out.println(username);
+        System.out.println(password);
         if (userService.check(username,password)) {
             User user = userService.findUserByUsername(username);
             httpServletRequest.getSession().setAttribute("user", user);
@@ -31,18 +33,18 @@ public class UserController {
     @GetMapping("/logout")
     @ResponseBody
     public Boolean logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception{
-//        System.out.println(httpServletRequest.getSession().getAttribute("user"));
         httpServletRequest.getSession().removeAttribute("user");
-//        httpServletResponse.sendRedirect("login");
+//        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/login");
         return Boolean.TRUE;
     }
 
+    // 重定向是直接登录还是咋样？但是重定向的原因在于，封装的请求头的方式为Get
     @PostMapping("/register")
     public User register(@RequestBody User user,HttpServletResponse httpServletResponse,HttpServletRequest httpServletRequest) throws Exception{
-        System.out.println(user);
+//        System.out.println(user);
         User user1 = userService.addUser(user);
         httpServletRequest.getSession().setAttribute("user",user1);
-//        httpServletResponse.sendRedirect("index");
+        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/login?username=" + user1.getUsername() + "&password=" + user1.getPassword());
         return user1;
     }
 }
