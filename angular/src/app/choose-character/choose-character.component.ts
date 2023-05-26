@@ -1,45 +1,33 @@
-import {Component, OnInit} from '@angular/core';
-import {io} from 'socket.io-client';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
+import {GameService} from "../game.service";
 
 @Component({
   selector: 'app-choose-character',
   templateUrl: './choose-character.component.html',
   styleUrls: ['./choose-character.component.css']
 })
-export class ChooseCharacterComponent implements OnInit {
-  socket: any;
-  list: any;
-  choosing: Boolean;
+export class ChooseCharacterComponent implements OnInit,OnDestroy {
+  list: any= [
+    {
+      name: "policeman",
+      chosen: false
+    },
+    {
+      name: "thief",
+      chosen: false
+    }
+  ];
+  choosing: boolean = true;
   choice: any;
 
-  constructor(private router: Router) {
-    this.choosing = true
-    this.list = [
-      {
-        name: "policeman",
-        chosen: false
-      },
-      {
-        name: "thief",
-        chosen: false
-      }
-    ]
-  }
+  constructor(private router: Router, private gameService:GameService) {}
 
   ngOnInit(): void {
-    this.socket = io('http://localhost:3000');
-    this.socket.on("connect", () => {
-      console.log("Connected to server!");
+    this.gameService.updateList.subscribe((res:any)=>{
+      this.list=res
     })
-
-    this.socket.on("characters", (res: any) => {
-      console.log(res.data)
-      this.list = res.data;
-    })
-
-    this.socket.on("ready", (res: any) => {
-      console.log("ready!")
+    this.gameService.gameReady.subscribe(()=>{
       this.router.navigate(['/main'], {
         queryParams: {
           character:this.choice
@@ -49,13 +37,13 @@ export class ChooseCharacterComponent implements OnInit {
   }
 
   choose(choice: string): void {
-    this.socket.emit('choose character', choice);
-    console.log(choice)
-    this.choosing = false
-    this.choice = choice
+    this.choice=choice
+    this.gameService.chooseCharacter(choice)
+    this.choosing=false
   }
 
-  //TODO:
-  // 2. 反馈选择的角色
-  // 3. 得到游戏开始信号 (waiting for the other player...)
+  @HostListener('unloaded')
+  ngOnDestroy() {
+    // console.log("Destroyed!")
+  }
 }

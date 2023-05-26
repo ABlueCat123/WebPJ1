@@ -1,13 +1,9 @@
 class Game {
-  constructor(choice = "Policeman") {
-    // if (!Detector.webgl) Detector.addGetWebGLMessage();
+  constructor(choice) {
     this.modes = Object.freeze({
       NONE: Symbol("none"),
       PRELOAD: Symbol("preload"),
       INITIALISING: Symbol("initialising"),
-      CREATING_LEVEL: Symbol("creating_level"),
-      ACTIVE: Symbol("active"),
-      GAMEOVER: Symbol("gameover")
     });
     this.mode = this.modes.NONE;
     this.container;
@@ -31,8 +27,6 @@ class Game {
       ],
       oncomplete: function () {
         game.init(choice);
-        game.animate();
-
       }
     }
 
@@ -53,7 +47,6 @@ class Game {
 
   init(choice) {
     this.mode = this.modes.INITIALISING;
-    // scene and lighting
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 10, 200000);
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x00a0f0);
@@ -76,7 +69,6 @@ class Game {
     // person model
     const loader = new THREE.FBXLoader();
     const game = this;
-    // const people = ['BeachBabe', 'BusinessMan', 'Doctor', 'FireFighter', 'Housewife', 'Policeman', 'Prostitute', 'Punk', 'RiotCop', 'Roadworker', 'Robber', 'Sheriff', 'Streetman', 'Waitress'];
     const people = ['Policeman', 'Robber'];
     let model;
     if (choice === 'policeman')
@@ -97,13 +89,12 @@ class Game {
           child.receiveShadow = true;
         }
       });
-      game.player.index = (Math.random() > 0.5) ? 0 : 2;//Math.floor(Math.random() * object.children.length);
-      const name = model;//object.children[game.player.index].name.substring(3);
+      game.player.index = (Math.random() > 0.5) ? 0 : 2;
       const colours = ['Black', 'Brown', 'White'];
       const colour = colours[Math.floor(Math.random() * colours.length)];
       const textureLoader = new THREE.TextureLoader();
 
-      textureLoader.load(`${game.assetsPath}/images/SimplePeople_${name}_${colour}.png`, function (texture) {
+      textureLoader.load(`${game.assetsPath}/images/SimplePeople_${model}_${colour}.png`, function (texture) {
         object.traverse(function (child) {
           if (child.isMesh) {
             child.material.map = texture;
@@ -112,10 +103,14 @@ class Game {
       });
 
       game.player.object = new THREE.Object3D();
-
-      game.player.object.position.set(-1000, 0, -1000);
-
-      game.player.object.rotation.set(0, 1.6, 0);
+      if (choice === 'policeman') {
+        game.player.object.position.set(7500, 0, -8500);
+        game.player.object.rotation.set(0, 0.1, 0);
+      } else // 站井盖上
+      {
+        game.player.object.position.set(-1000, 0, -1000);
+        game.player.object.rotation.set(0, 1.6, 0);
+      }
 
       game.sun.target = game.player.object;
       game.player.object.add(object);
@@ -131,7 +126,7 @@ class Game {
     // window renderer
     this.renderer = new THREE.WebGLRenderer({antialias: true});
     this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth-20, window.innerHeight-20);
+    this.renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
     this.renderer.shadowMap.enabled = true;
     this.container = document.querySelector('#renderer');
     let canvas = this.renderer.domElement;
@@ -243,7 +238,7 @@ class Game {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
 
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
 
   }
 
@@ -372,5 +367,15 @@ class Game {
     this.renderer.render(this.scene, this.camera);
     if (this.stats !== undefined) this.stats.update();
 
+  }
+  getLocalUserInfo(){
+    return this;
+    // return {
+    //   x: this.player.object.position.x,
+    //   y: this.player.object.position.y,
+    //   z: this.player.object.position.z,
+    //   h: this.player.object.rotation.y,
+    //   pb: this.player.object.rotation.x
+    // };
   }
 }
