@@ -3,7 +3,6 @@ package com.example.springboot.controller;
 import com.example.springboot.entity.Record;
 import com.example.springboot.entity.User;
 import com.example.springboot.service.UserService;
-import com.example.springboot.util.MySqlConnector;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +20,8 @@ public class UserController {
     @GetMapping("/login")
     @ResponseBody
     public Boolean login(@Param("username")String username, @Param("password") String password, HttpServletRequest httpServletRequest) throws Exception{
+        System.out.println(username);
+        System.out.println(password);
         if (userService.check(username,password)) {
             User user = userService.findUserByUsername(username);
             httpServletRequest.getSession().setAttribute("user", user);

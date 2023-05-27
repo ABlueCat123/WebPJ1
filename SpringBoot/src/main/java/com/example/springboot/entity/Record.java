@@ -39,4 +39,7 @@ public class Record {
 
     // 胜利玩家扮演的角色
     private Long winnerRole;
+
+    // 最终比分？ like 90:60
+    private String score;
 }

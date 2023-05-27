@@ -1,5 +1,7 @@
 import {createServer} from "http";
 import {Server} from "socket.io";
+import axios from "axios";
+
 // $env:DEBUG='app';nodemon ./index.js
 
 const httpServer = createServer();
@@ -71,18 +73,28 @@ io.on("connection", socket => {
     })
 
     socket.on("question", (callback) => {
-        callback( {
-            body: "This is only a test",
-            choices: {
-                A: 'this is choice A',
-                B: 'this is choice B',
-                C: 'this is choice C',
-                D: 'this is choice D'
-            },
-            answer: 'A',
-            time: new Date().getTime(),
-            grabbed:false
-        })
+        try {
+            const response = axios.get('http://localhost:8081/question/getOne')
+                .then(response => {
+
+                    const data = response.data
+
+                    callback({
+                        body: data.description,
+                        choices: {
+                            A: data.a,
+                            B: data.b,
+                            C: data.c,
+                            D: data.d
+                        },
+                        answer: data.answer === 1 ? 'A' : data.answer === 2 ? 'B' : data.answer === 3 ? 'C' : 'D',
+                        time: new Date().getTime(),
+                        grabbed: false
+                    });
+                })
+        } catch (error) {
+            console.error(error);
+        }
     })
 
 
