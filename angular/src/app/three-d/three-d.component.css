@@ -1,0 +1,74 @@
+#questionBox{
+  position: absolute;
+  margin: auto;
+  padding: 1em;
+  height: 300px;
+  width: 300px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: #ffdf9e;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 1em;
+  box-shadow:  0 0 1em #00000033;
+}
+#questionBox .body{
+  font-size: 1.25em;
+  width: 100%;
+  text-shadow: 2px 2px 2px #e1c788;
+  text-align: center;
+  margin: 1em 0;
+  color: #593535;
+  font-weight: 900;
+}
+li{
+  font-size: 1.25rem;
+  color: #ffffff;
+  text-shadow: 2px 2px 2px goldenrod;
+  text-align: center;
+  display: block;
+  padding: 0;
+}
+li:hover{
+  cursor: pointer;
+}
+
+li.--disabled{
+  color: #ccc;
+  cursor: not-allowed;
+  text-shadow: 2px 2px 2px goldenrod;
+}
+
+
+
+
+button{
+  background-color: firebrick;
+  color: white;
+  font-weight: 900;
+  padding-top: .5em;
+  padding-bottom: .5em;
+  border-width: 3px;
+  -webkit-border-radius: .5em;
+  -moz-border-radius: .5em;
+  border-radius: .5em;
+  margin-top: 1em;
+}
+
+button:hover{
+  cursor: pointer;
+}
+
+button.--disabled{
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button.--disabled:hover{
+  color: #ffffff;
+  cursor: not-allowed;
+}
+

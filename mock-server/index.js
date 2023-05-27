@@ -23,6 +23,21 @@ let characterList = [
         chosen: false
     }
 ]
+
+let playerList = [
+    {
+        name: 'policeman',
+        userId: 'test1',
+        position: {},
+        online: true
+    },
+    {
+        name: 'thief',
+        userId: 'test2',
+        position: {},
+        online: true
+    }
+]
 io.on("connect", (socket) => {
     console.log("connect")
     socket.emit("characters", {data: characterList});
@@ -44,5 +59,27 @@ io.on("connection", socket => {
         }
     })
 
+    socket.on("update", data => {
+        playerList.forEach(player => {
+            if (player.name === data.name) {
+                player.position = data.pos
+            }
+        })
+        socket.broadcast.emit("player state", playerList)
+    })
+
+    socket.on("question", (callback) => {
+        callback("got it", {
+            body: "This is only a test",
+            choices: {
+                A: 'this is choice A',
+                B: 'this is choice B',
+                C: 'this is choice C',
+                D: 'this is choice D'
+            },
+            answer: 'A',
+            time: new Date()
+        })
+    })
 })
 

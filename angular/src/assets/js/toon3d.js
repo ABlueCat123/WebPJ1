@@ -515,7 +515,6 @@ class Preloader{
 							  document.body.removeChild(loader.domElement);
 						  }
 					  }
-            console.log("Running on complete")
 					  loader.oncomplete();
 				  }
 			  }

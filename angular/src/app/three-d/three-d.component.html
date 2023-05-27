@@ -1,3 +1,35 @@
 <section>
   <div id="renderer"></div>
+  <span id="questionBox"
+        *ngIf="this.stage===this.stages.SHOW
+        ||this.stage===this.stages.GRAB
+        ||this.stage===this.stages.CHOOSE">
+    <div class="body">{{this.question.body}}</div>
+    <ul>
+      <li
+        [class.--disabled]="stage!==stages.CHOOSE"
+        (click)="null">
+        A: {{this.question.choices['A']}}
+      </li>
+      <li
+        [class.--disabled]="stage!==stages.CHOOSE"
+        (click)="null">
+        B: {{this.question.choices['B']}}
+      </li>
+      <li
+              [class.--disabled]="stage!==stages.CHOOSE"
+              (click)="null">
+        C: {{this.question.choices['C']}}
+      </li>
+      <li
+        [class.--disabled]="stage!==stages.CHOOSE"
+        (click)="null">
+        D: {{this.question.choices['D']}}
+      </li>
+    </ul>
+    <button
+      [class.--disabled]="stage!==stages.GRAB"
+      (click)="grabStart()">Grab!</button>
+  </span>
+  <div id="panel" *ngIf="this.stage===stages.MOVE"></div>
 </section>
