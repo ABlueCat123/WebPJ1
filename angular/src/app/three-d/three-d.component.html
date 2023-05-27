@@ -32,6 +32,9 @@
       (click)="grabStart()">
       {{this.buttonText}}
     </button>
+    <button id="catch" *ngIf="this.showCatchButton">
+      CATCH
+    </button>
   </span>
   <div id="panel" *ngIf="this.stage===stages.MOVE"></div>
 </section>

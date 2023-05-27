@@ -20,7 +20,7 @@ import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 import { ThreeDComponent } from './three-d/three-d.component';
 import { ChatComponent } from './chat/chat.component';
 import { LogoutComponent } from './logout/logout.component';
-
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 const appRoutes: Routes = [
   {path: '', component: GreetingsComponent},
   {path: 'login', component: LoginComponent},
@@ -58,7 +58,8 @@ const appRoutes: Routes = [
     AppRoutingModule,
     BrowserAnimationsModule,
     MatListModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSnackBarModule
   ],
   providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]

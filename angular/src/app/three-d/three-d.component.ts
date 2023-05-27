@@ -37,7 +37,8 @@ export class ThreeDComponent implements OnInit {
   })
   stage: any; //默认为 NONE
   buttonText: any;
-
+  chooseTimer: any;
+  showCatchButton: boolean=false;
   // functions
   constructor(private activatedRoute: ActivatedRoute, private gameService: GameService) {
     activatedRoute.queryParams.subscribe(queryParams => {
@@ -278,6 +279,8 @@ export class ThreeDComponent implements OnInit {
   playerControl(forward: any, turn: any) {
     turn = -turn;
     this.player.move = {forward, turn};
+    this.stage=this.stages.NONE;
+    this.requestQuestion();
   }
 
   createCameras() {
@@ -409,7 +412,7 @@ export class ThreeDComponent implements OnInit {
         }
       }
     }
-    this.updateSocket()
+    this.updatePosition()
   }
 
   animate() {
@@ -434,7 +437,7 @@ export class ThreeDComponent implements OnInit {
     this.renderer.render(this.scene, this.camera);
   }
 
-  updateSocket() {
+  updatePosition() {
     if (this.socket !== undefined) {
       this.socket.emit('update', {
         name: this.character,
@@ -469,23 +472,29 @@ export class ThreeDComponent implements OnInit {
         }
       })
     })
+  }
 
+  registerGrabTimer() {
+    this.socket.on("grab timeout", (msg: string) => {
+      this.gameService.showMessage(msg);
+      this.stage = this.stages.NONE
+      this.requestQuestion()
+    })
   }
 
   requestQuestion() {
-
     this.socket.emit("question", (response: any) => {
       this.stage = this.stages.SHOW;
       this.question = response;
       let time = new Date().getTime()
       //countdown
       let timeLeft = response.time - time + 3000;
-      const timeInterval=setInterval(() => {
+      const timeInterval = setInterval(() => {
         timeLeft--;
         this.buttonText = timeLeft
         if (timeLeft <= 0) {
           timeLeft = 0;
-          this.stage=this.stages.GRAB
+          this.stage = this.stages.GRAB
           this.buttonText = "Grab!"
           clearInterval(timeInterval)
         }
@@ -494,22 +503,54 @@ export class ThreeDComponent implements OnInit {
   }
 
   grabStart() {
-    if(this.stage===this.stages.GRAB){
-      //允许抢答的阶段。
-      // 发送socket!
-      this.socket.emit("grab",(got:boolean)=>{
-        if(got)
-          this.stage=this.stages.CHOOSE
-        else
-          this.stage=this.stages.SHOW
+    if (this.stage === this.stages.GRAB) {
+      this.socket.emit("grab", this.character, (got: boolean) => {
+        if (got) {
+          this.stage = this.stages.CHOOSE
+          this.chooseTimer = setTimeout(() => {
+            this.socket.emit("wrong answer")
+          }, 10 * 1000)
+        } else
+          this.stage = this.stages.SHOW
       });
     }
   }
-  makeChoice(choice:string){
 
-      // this.socket.emit("make choice",()=>{
-      //
-      // })
+  makeChoice(choice: string) {
+    clearTimeout(this.chooseTimer)
+    if (choice === this.question.answer) {
+      this.socket.emit("right answer")
+    } else {
+      this.socket.emit("wrong answer")
+    }
+  }
+
+  registerListenOnAnswer() {
+    this.socket.on("answered", (data: any) => {
+      if (data.right) {//right answer
+        if (data.answerer === this.character) {// move on!
+          this.stage = this.stages.MOVE
+          this.gameService.showMessage("You can take a move now.")
+        } else {// can only watch
+          this.stage = this.stages.NONE
+        }
+      } else {//wrong answer
+        if (data.answerer === this.character) {
+          this.stage = this.stages.SHOW
+        } else {
+          this.stage = this.stages.CHOOSE
+        }
+      }
+      this.gameService.showMessage(data.message)
+    })
+  }
+
+  registerCatch() {
+    this.socket.on("catchable", () => {
+      // TODO: show the catch button
+      if (this.character==='policeman')
+        this.showCatchButton=true;
+    })
   }
 }
 

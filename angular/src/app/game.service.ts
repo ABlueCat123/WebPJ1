@@ -1,5 +1,6 @@
-import {EventEmitter, Injectable, OnInit} from '@angular/core';
+import {EventEmitter, Inject, Injectable, OnInit} from '@angular/core';
 import {io} from "socket.io-client";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class GameService {
   updateList: EventEmitter<any> = new EventEmitter<any>();
   gameReady: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor() {
+  constructor(public snackBar:MatSnackBar) {
     this.socket = io('http://localhost:3000/');
     this.socket.connect();
 
@@ -32,6 +33,12 @@ export class GameService {
   chooseCharacter(choice: string) {
     this.socket.emit('choose character', choice);
   }
-
+  showMessage(msg:string){
+    this.snackBar.open(msg,'Confirm',{
+      horizontalPosition:"center",
+      verticalPosition:"top",
+      duration:2000
+    })
+  }
 
 }
