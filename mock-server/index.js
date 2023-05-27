@@ -29,12 +29,14 @@ let playerList = [
         name: 'policeman',
         userId: 'test1',
         position: {},
+        grabTime:'',
         online: true
     },
     {
         name: 'thief',
         userId: 'test2',
         position: {},
+        grabTime:'',
         online: true
     }
 ]
@@ -69,7 +71,7 @@ io.on("connection", socket => {
     })
 
     socket.on("question", (callback) => {
-        callback("got it", {
+        callback( {
             body: "This is only a test",
             choices: {
                 A: 'this is choice A',
@@ -78,8 +80,15 @@ io.on("connection", socket => {
                 D: 'this is choice D'
             },
             answer: 'A',
-            time: new Date()
+            time: new Date().getTime(),
+            grabbed:false
         })
+    })
+
+
+    socket.on("grab", (callback)=>{
+        // 这里的逻辑没有写，就假装这位成功抢到了吧
+        callback(true)
     })
 })
 

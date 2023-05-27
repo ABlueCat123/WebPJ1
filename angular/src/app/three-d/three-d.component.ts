@@ -35,8 +35,10 @@ export class ThreeDComponent implements OnInit {
     CHOOSE: Symbol("答题阶段"),
     MOVE: Symbol("移动阶段"),
   })
-  stage: any; //NONE
+  stage: any; //默认为 NONE
+  buttonText: any;
 
+  // functions
   constructor(private activatedRoute: ActivatedRoute, private gameService: GameService) {
     activatedRoute.queryParams.subscribe(queryParams => {
       this.character = queryParams['character'];
@@ -457,7 +459,6 @@ export class ThreeDComponent implements OnInit {
 
   registerListenOnRemote() {
     this.socket.on("player state", (res: any) => {
-      console.log(res)
       res.forEach((player: any) => {
         if (this.character !== player.name) {
           let data = player.position
@@ -473,14 +474,42 @@ export class ThreeDComponent implements OnInit {
 
   requestQuestion() {
 
-    this.socket.emit("question", (message: string, response: any) => {
-      console.log(response)
+    this.socket.emit("question", (response: any) => {
       this.stage = this.stages.SHOW;
       this.question = response;
+      let time = new Date().getTime()
+      //countdown
+      let timeLeft = response.time - time + 3000;
+      const timeInterval=setInterval(() => {
+        timeLeft--;
+        this.buttonText = timeLeft
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          this.stage=this.stages.GRAB
+          this.buttonText = "Grab!"
+          clearInterval(timeInterval)
+        }
+      }, 1);
     })
   }
 
   grabStart() {
+    if(this.stage===this.stages.GRAB){
+      //允许抢答的阶段。
+      // 发送socket!
+      this.socket.emit("grab",(got:boolean)=>{
+        if(got)
+          this.stage=this.stages.CHOOSE
+        else
+          this.stage=this.stages.SHOW
+      });
+    }
+  }
+  makeChoice(choice:string){
+
+      // this.socket.emit("make choice",()=>{
+      //
+      // })
   }
 }
 

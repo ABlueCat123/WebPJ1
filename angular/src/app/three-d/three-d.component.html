@@ -8,28 +8,30 @@
     <ul>
       <li
         [class.--disabled]="stage!==stages.CHOOSE"
-        (click)="null">
+        (click)="stage===stages.CHOOSE&&makeChoice('A')">
         A: {{this.question.choices['A']}}
       </li>
       <li
         [class.--disabled]="stage!==stages.CHOOSE"
-        (click)="null">
+        (click)="stage===stages.CHOOSE&&makeChoice('B')">
         B: {{this.question.choices['B']}}
       </li>
       <li
-              [class.--disabled]="stage!==stages.CHOOSE"
-              (click)="null">
+        [class.--disabled]="stage!==stages.CHOOSE"
+        (click)="stage===stages.CHOOSE&&makeChoice('C')">
         C: {{this.question.choices['C']}}
       </li>
       <li
         [class.--disabled]="stage!==stages.CHOOSE"
-        (click)="null">
+        (click)="stage===stages.CHOOSE&&makeChoice('D')">
         D: {{this.question.choices['D']}}
       </li>
     </ul>
     <button
       [class.--disabled]="stage!==stages.GRAB"
-      (click)="grabStart()">Grab!</button>
+      (click)="grabStart()">
+      {{this.buttonText}}
+    </button>
   </span>
   <div id="panel" *ngIf="this.stage===stages.MOVE"></div>
 </section>
