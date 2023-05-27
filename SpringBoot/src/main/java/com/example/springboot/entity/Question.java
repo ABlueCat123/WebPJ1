@@ -13,5 +13,10 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
+
+    private String A;
+    private String B;
+    private String C;
+    private String D;
     private String answer;
 }
