@@ -1,17 +1,12 @@
 package com.example.springboot.controller;
 
-import com.example.springboot.entity.Record;
 import com.example.springboot.entity.User;
 import com.example.springboot.service.UserService;
-import com.example.springboot.util.MySqlConnector;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class UserController {

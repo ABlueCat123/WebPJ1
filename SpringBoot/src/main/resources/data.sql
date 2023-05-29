@@ -1,0 +1,1 @@
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('1', '2', '3', '4', 'B', '1+1');
