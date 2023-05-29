@@ -16,6 +16,8 @@ public class UserController {
     @GetMapping("/login")
     @ResponseBody
     public Boolean login(@Param("username")String username, @Param("password") String password, HttpServletRequest httpServletRequest) throws Exception{
+        System.out.println(username);
+        System.out.println(password);
         if (userService.check(username,password)) {
             User user = userService.findUserByUsername(username);
             httpServletRequest.getSession().setAttribute("user", user);

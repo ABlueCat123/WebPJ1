@@ -72,3 +72,8 @@ button.--disabled:hover{
   cursor: not-allowed;
 }
 
+button#catch{
+  position: absolute;
+  right: 2em;
+  bottom: 2em;
+}

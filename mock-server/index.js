@@ -1,5 +1,7 @@
 import {createServer} from "http";
 import {Server} from "socket.io";
+import axios from "axios";
+
 // $env:DEBUG='app';nodemon ./index.js
 
 const httpServer = createServer();
@@ -29,24 +31,28 @@ let playerList = [
         name: 'policeman',
         userId: 'test1',
         position: {},
-        grabTime:'',
+        grabTime: '',
         online: true
     },
     {
         name: 'thief',
         userId: 'test2',
         position: {},
-        grabTime:'',
+        grabTime: '',
         online: true
     }
 ]
+let currentQuestion;
+let gameTimer;
+let grabTimer;
 io.on("connect", (socket) => {
     console.log("connect")
-    socket.emit("characters", {data: characterList});
 })
 io.on("connection", socket => {
+    socket.on("characters", (callback) => {
+        callback({data: characterList})
+    })
     socket.on('choose character', (choice) => {
-
         for (let element of characterList)
             if (element.name === choice)
                 element.chosen = true;
@@ -58,6 +64,14 @@ io.on("connection", socket => {
         if (ready) {
             socket.emit("ready")
             socket.broadcast.emit("ready")
+            gameTimer = setTimeout(() => {
+                let result = {
+                    winner: 'thief',
+                    message: "Time is over. The thief has won!"
+                }
+                socket.emit("game over", result)
+                socket.broadcast.emit("game over", result)
+            }, 60 * 10 * 1000)
         }
     })
 
@@ -68,27 +82,93 @@ io.on("connection", socket => {
             }
         })
         socket.broadcast.emit("player state", playerList)
+        let pos1 = playerList[0].position
+        let pos2 = playerList[1].position
+        if ((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2 <= 600 ** 2) {
+            socket.emit("catchable");
+            socket.broadcast.emit("catchable");
+        }
     })
 
-    socket.on("question", (callback) => {
-        callback( {
-            body: "This is only a test",
-            choices: {
-                A: 'this is choice A',
-                B: 'this is choice B',
-                C: 'this is choice C',
-                D: 'this is choice D'
-            },
-            answer: 'A',
-            time: new Date().getTime(),
-            grabbed:false
-        })
+    socket.on("question request", () => {
+        try {
+            const response = axios.get('http://localhost:8081/question/getOne')
+                .then(response => {
+                    const data = response.data
+                    currentQuestion = {
+                        body: data.description,
+                        choices: {
+                            A: data.a,
+                            B: data.b,
+                            C: data.c,
+                            D: data.d
+                        },
+                        answer: data.answer === 1 ? 'A' : data.answer === 2 ? 'B' : data.answer === 3 ? 'C' : 'D',
+                        time: new Date().getTime(),
+                        grabbed: false,
+                        grabber: ''
+                    }
+                    socket.emit("question", currentQuestion);
+                    socket.broadcast.emit("question", currentQuestion);
+                    // grabTimer=setTimeout(()=>{
+                    //     let msg="Grab timeout, the answer is "+currentQuestion.answer+'.'
+                    //     socket.emit("grab timeout",msg)
+                    //     socket.broadcast.emit("grab timeout",msg)
+                    //     clearTimeout(grabTimer);
+                    // },10000)
+                    //TODO: 超时逻辑有点问题。
+                })
+        } catch (error) {
+            console.error(error);
+        }
     })
 
 
-    socket.on("grab", (callback)=>{
-        // 这里的逻辑没有写，就假装这位成功抢到了吧
-        callback(true)
+    socket.on("grab", (character, callback) => {
+        clearTimeout(grabTimer)
+        if (currentQuestion.grabbed === false) {
+            currentQuestion.grabbed = true;
+            currentQuestion.grabber = character
+            callback(true)
+        } else
+            callback(false)
+    })
+    socket.on("right answer", () => {
+        let msg = currentQuestion.grabber + " answered right.\n" +
+            " The answer is " + currentQuestion.answer + '.\n' +
+            'The ' + currentQuestion.grabber + " can take a move now."
+        let data = {
+            right: true,
+            answerer: currentQuestion.grabber,
+            message: msg
+        }
+        socket.emit("answered", data)
+        socket.broadcast.emit("answered", data)
+
+    })
+    socket.on("wrong answer", () => {
+        let msg = currentQuestion.grabber + " answered wrong.\n" +
+            " Now side changes."
+        let data = {
+            right: false,
+            answerer: currentQuestion.grabber,
+            message: msg
+        }
+        socket.emit("answered", data)
+        socket.broadcast.emit("answered", data)
+        if (currentQuestion.grabber === 'policeman')
+            currentQuestion.grabber = 'thief'
+        else if (currentQuestion.grabber === 'thief')
+            currentQuestion.grabber = 'policeman'
+    })
+    socket.on("catch", () => {
+        let result = {
+            winner: 'policeman',
+            message: "The policeman has caught the thief.\n" +
+                "The policeman has won!"
+        }
+        socket.emit("game over", result)
+        socket.broadcast.emit("game over", result)
     })
 })
 

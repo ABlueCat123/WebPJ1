@@ -16,7 +16,7 @@ public class RecordController {
     @PostMapping("/record/add")
     @ResponseBody
     public Boolean addRecord(@RequestBody Record record){
-//        System.out.println(record);
+        System.out.println(record);
         if (recordService.addRecord(record) == null) return Boolean.FALSE;
         return Boolean.TRUE;
     }
