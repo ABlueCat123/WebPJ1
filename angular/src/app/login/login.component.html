@@ -1,5 +1,11 @@
-<form action="">
-    username: <input type="text" name="username" id="username"><br>
-    password: <input type="text" name="password" id="password"><br>
-    <button type="button" (click)="login()">Login in</button>
-</form>
+<section>
+    username: <input type="text" name="username" id="login-username"><br>
+    password: <input type="text" name="password" id="login-password"><br>
+    <button type="button" (click)="login()"><span>Log in</span></button>
+
+    <ul>
+        <li routerLink="/">
+          Back
+        </li>
+    </ul>
+</section>

@@ -9,8 +9,10 @@ export class SelfInfoComponent implements OnInit {
   user : any;
 
   ngOnInit(): void {
-    // just for test
-    this.user.username = "test";
-    this.user.password = "test";
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.user = JSON.parse(user);
+      console.log(this.user);
+    }
   }
 }

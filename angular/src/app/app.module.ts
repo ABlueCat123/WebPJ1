@@ -10,7 +10,6 @@ import {MatListModule} from "@angular/material/list";
 import {MatButtonModule} from "@angular/material/button";
 import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
-import {RoomComponent} from './room/room.component';
 import {SelfInfoComponent} from './self-info/self-info.component';
 import {GalleryComponent} from './gallery/gallery.component';
 import {SettingsComponent} from './settings/settings.component';
@@ -21,10 +20,13 @@ import { ThreeDComponent } from './three-d/three-d.component';
 import { ChatComponent } from './chat/chat.component';
 import { LogoutComponent } from './logout/logout.component';
 import {MatSnackBarModule} from "@angular/material/snack-bar";
+import { HttpClientModule, HttpClient } from '@angular/common/http';
+
 const appRoutes: Routes = [
   {path: '', component: GreetingsComponent},
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
+  {path: 'logout', component: LogoutComponent},
   {path: 'menu', component: MenuComponent},
   {path: 'menu/new-game/choose-room', component: ChooseRoomComponent},
   {path: 'menu/new-game/choose-character', component: ChooseCharacterComponent},
@@ -42,7 +44,6 @@ const appRoutes: Routes = [
     GreetingsComponent,
     LoginComponent,
     RegisterComponent,
-    RoomComponent,
     SelfInfoComponent,
     GalleryComponent,
     SettingsComponent,
@@ -59,9 +60,13 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     MatListModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    HttpClientModule,
   ],
-  providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
+  providers: [
+    {provide: LocationStrategy, useClass: HashLocationStrategy},
+    HttpClient
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

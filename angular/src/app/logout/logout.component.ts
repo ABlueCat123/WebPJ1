@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-logout',
@@ -7,7 +8,9 @@ import { Component } from '@angular/core';
 })
 export class LogoutComponent {
 
-  logout() {
-    window.alert("Sign out");
+  constructor(private router: Router) {
+    localStorage.removeItem('user');
+    this.router.navigate(['/']);
+    console.log('logout');
   }
 }

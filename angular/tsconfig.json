@@ -23,7 +23,8 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "types": ["socket.io-client"]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
