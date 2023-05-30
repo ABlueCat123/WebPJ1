@@ -1,1 +1,7 @@
-<p>chat works!</p>
+<h1>Chat Room</h1>
+
+<div *ngFor="let message of messages">
+    {{ message }}
+</div>
+
+<input (keyup.enter)="sendMessage()" placeholder="Type your message here...">

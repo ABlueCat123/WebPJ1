@@ -46,4 +46,12 @@ export class ChooseCharacterComponent implements OnInit,OnDestroy {
   ngOnDestroy() {
     // console.log("Destroyed!")
   }
+
+  leaveRoom() {
+    const room = localStorage.getItem('room');
+    if (room) {
+      this.gameService.socket.emit('leave room', room);
+    }
+    localStorage.removeItem('room');
+  }
 }

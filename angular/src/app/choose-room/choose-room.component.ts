@@ -1,36 +1,57 @@
-import { Component, OnDestroy } from '@angular/core';
-import { io, Socket } from "socket.io-client";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from "@angular/router";
+import { GameService } from '../game.service';
 
 @Component({
   selector: 'app-choose-room',
   templateUrl: './choose-room.component.html',
   styleUrls: ['./choose-room.component.css']
 })
-export class ChooseRoomComponent implements OnDestroy {
-  private socket: Socket;
+export class ChooseRoomComponent implements OnInit{
   rooms: any[] = [];
-  selectedRoom = '';
 
-  constructor() {
-    // 连接服务器
-    this.socket = io('http://localhost:4200');
+  constructor(private router: Router, private gameService: GameService) {}
 
-    // 监听可用房间列表
-    this.socket.on('roomList', (rooms: any[]) => {
+  ngOnInit(): void {
+    // 获取可用房间列表
+    this.gameService.socket.emit('room list');
+    this.gameService.socket.on('room list', (rooms: any[]) => {
       this.rooms = rooms;
+      console.log(this.rooms);
     });
   }
 
-  ngOnDestroy() {
-    // 清理事件监听器和关闭连接
-    this.socket.off('roomList');
-    this.socket.disconnect();
+  createRoom() {
+    const user = localStorage.getItem('user');
+    if (user) {
+      console.log('create room');
+      this.gameService.socket.emit('join room', String(JSON.parse(user).id));
+      this.gameService.socket.on('message', (message: String) => {
+        if (message === 'success') {
+          localStorage.setItem('room', String(JSON.parse(user).id));
+          this.router.navigate(['/choose-character']);
+        }
+        else {
+          window.alert(message);
+        }
+      });
+    }
   }
 
-  joinRoom() {
+  joinRoom(room : any) {
+    console.log(room);
     // 发送请求加入房间
-    if (this.selectedRoom) {
-      this.socket.emit('joinRoom', this.selectedRoom);
+    if (room) {
+      this.gameService.socket.emit('join room', room);
+      this.gameService.socket.on('message', (message : String) => {
+        if (message === 'success') {
+          localStorage.setItem('room', room);
+          this.router.navigate(['/choose-character']);
+        }
+        else {
+          window.alert(message);
+        }
+      });
     }
   }
 }

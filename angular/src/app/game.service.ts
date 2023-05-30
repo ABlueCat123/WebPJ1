@@ -14,16 +14,40 @@ export class GameService {
   gameReady: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(public snackBar:MatSnackBar) {
-    this.socket = io('http://localhost:3000/');
-    this.socket.connect();
+    // 连接socket
+    this.socket = io('http://localhost:3000/', {   
+      transports: ['websocket'],
+      upgrade: false
+    });
+    // const storedSocketId = localStorage.getItem('socketId');
+    // if (storedSocketId) {
+    //   console.log(storedSocketId);
+    //   this.socket = io('http://localhost:3000/', {   
+    //     transports: ['websocket'],
+    //     upgrade: false,
+    //     // query : { id: storedSocketId }
+    //   });
+    // }
+    // else {
+    //   this.socket = io('http://localhost:3000/', {   
+    //     transports: ['websocket'],
+    //     upgrade: false
+    //   });
+    //   localStorage.setItem('socketId', this.socket.id);
+    // }
 
-    this.socket.on("connect", () => {
-      this.connected = true
-    })
+    const room = localStorage.getItem('room');
+    if (room) {
+      this.socket.emit('join room', room);
+    }
+
+    this.socket.on('connect', () => {
+      this.connected = true;
+    });
 
     this.socket.on("ready", (res: any) => {
       this.inGame=true;
-      this.gameReady.emit(null)
+      this.gameReady.emit(null);
     })
 
     setInterval(()=>{

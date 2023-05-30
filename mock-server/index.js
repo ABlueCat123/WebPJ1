@@ -8,7 +8,8 @@ const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
         origin: "http://localhost:4200"
-    }
+    },
+    transports: ['websocket']
 });
 
 httpServer.listen(3000, () => {
@@ -45,10 +46,57 @@ let playerList = [
 let currentQuestion;
 let gameTimer;
 let grabTimer;
+
+// function isSocketInIo(socketId, io) {
+//     for(let socket in io.sockets.sockets) {
+//       if(io.sockets.sockets[socket].id === socketId) {
+//         return true;
+//       }
+//     }
+//     return false;
+// }
 io.on("connect", (socket) => {
-    console.log("connect")
+    // const socketId = socket.handshake.query.id;
+    socket.leave(socket.id);
+    // if (socketId) {
+        // socket.id = socketId;
+    // }
+    socket.join('test! do not choose this');
+    console.log(`${socket.id} connect`);
 })
-io.on("connection", socket => {
+
+io.on("connection", (socket) => {
+    socket.on("room list", () => {
+        console.log(io.of('/').adapter.rooms);
+        // const rooms = Object.keys(io.sockets.adapter.rooms);
+        // const rooms = Object.keys(io.of('/').adapter.rooms);
+        // const roomSet = new Set(io.sockets.adapter.rooms.keys());
+        const roomSet = new Set(io.of('/').adapter.rooms.keys());
+        const rooms = Array.from(roomSet);
+        console.log(rooms);
+        socket.emit('room list', rooms);
+    });
+    socket.on('join room', (room) => {
+        console.log('join room');
+        if (io.sockets.adapter.rooms.get(room) == undefined || io.sockets.adapter.rooms.get(room).size < 2) {
+            socket.join(room);
+            socket.emit('message', `success`);
+            console.log(`User ${socket.id} joined room ${room}`);
+        }
+        else {
+            socket.emit('message', `the room ${room} is full`);
+            console.log(`the room ${room} is full`);
+        }
+    });
+    socket.on('leave room', (room) => {
+        console.log('leave room');
+        socket.leave(room)
+    });
+    socket.on('chat', (message) => {
+        console.log(`Received message: ${message}`);
+        socket.broadcast.to(socket.rooms).emit('chat', message);
+    });
+
     socket.on("characters", (callback) => {
         callback({data: characterList})
     })
