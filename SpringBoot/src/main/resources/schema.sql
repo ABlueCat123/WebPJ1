@@ -1,3 +1,5 @@
+drop table if exists question;
+
 create table if not exists question
 (
     id          bigint auto_increment
