@@ -29,8 +29,8 @@ export class SelfInfoComponent implements OnInit {
     var password = document.getElementById("update-password") as HTMLInputElement | null;
   
     if (username && password && username.value && password.value) {
-      this.http.post(this.url,
-        {"id": JSON.parse(this.user).id,
+      this.http.put(this.url,
+        {"id": this.user.id,
         "username": username.value,
         "password": password.value}, httpOptions).subscribe((response: any) => {
           console.log(response);
@@ -38,7 +38,7 @@ export class SelfInfoComponent implements OnInit {
             localStorage.setItem('user', JSON.stringify(response));
           }
           else {
-            window.alert('failed to update');
+            window.alert('The user name already exists!');
           }
         });
     }

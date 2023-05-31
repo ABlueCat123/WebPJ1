@@ -41,11 +41,16 @@ public class UserController {
         return user1;
     }
 
-    @PostMapping("/change")
+    @PutMapping("/change")
     public User change(@RequestBody User user,HttpServletRequest httpServletRequest){
-
-        User userNew = userService.change(user.getUsername(),user.getPassword(), user.getId());
-        httpServletRequest.getSession().setAttribute("user",userNew);
-        return user;
+        User user1 = userService.findUserByUsername(user.getUsername());
+        if (user1 != null && user1.getId() != user.getId()) {
+            return null;
+        }
+        else {
+            User userNew = userService.change(user.getUsername(),user.getPassword(), user.getId());
+            httpServletRequest.getSession().setAttribute("user",userNew);
+            return user;
+        }
     }
 }
