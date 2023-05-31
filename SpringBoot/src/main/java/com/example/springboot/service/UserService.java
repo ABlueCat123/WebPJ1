@@ -13,5 +13,5 @@ public interface UserService {
     User updateUser(User user);
     List<User> findAll();
     User addUser(User user);
-    User change(String username,String password);
+    User change(String username,String password,Long id);
 }

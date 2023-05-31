@@ -42,7 +42,10 @@ public class UserController {
     }
 
     @PostMapping("/change")
-    public User change(@RequestBody Map<String,String> params,HttpServletRequest httpServletRequest){
-        return userService.change(params.get("username"),params.get("password"));
+    public User change(@RequestBody User user,HttpServletRequest httpServletRequest){
+
+        User userNew = userService.change(user.getUsername(),user.getPassword(), user.getId());
+        httpServletRequest.getSession().setAttribute("user",userNew);
+        return user;
     }
 }

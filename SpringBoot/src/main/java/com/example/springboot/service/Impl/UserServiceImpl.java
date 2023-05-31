@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User change(String username, String password) {
-        if (userDao.update(username,password) > 0) return findUserByUsername(username);
+    public User change(String username, String password,Long id) {
+        if (userDao.update(username,password,id) > 0) return findUserById(id);
         return null;
     }
 }
