@@ -52,4 +52,10 @@ public class UserServiceImpl implements UserService {
     public User addUser(User user) {
         return userDao.save(user);
     }
+
+    @Override
+    public User change(String username, String password) {
+        if (userDao.update(username,password) > 0) return findUserByUsername(username);
+        return null;
+    }
 }

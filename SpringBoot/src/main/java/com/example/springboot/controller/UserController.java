@@ -40,4 +40,9 @@ public class UserController {
         httpServletRequest.getSession().setAttribute("user",user1);
         return user1;
     }
+
+    @PostMapping("/change")
+    public User change(@RequestBody Map<String,String> params,HttpServletRequest httpServletRequest){
+        return userService.change(params.get("username"),params.get("password"));
+    }
 }
