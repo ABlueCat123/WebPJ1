@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 export class LogoutComponent {
 
   constructor(private router: Router) {
-    localStorage.clear();
+    localStorage.removeItem('user');
     this.router.navigate(['/']);
     console.log('logout');
   }

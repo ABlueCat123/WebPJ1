@@ -5,7 +5,7 @@ import { GameService } from '../game.service';
 @Component({
   selector: 'app-choose-room',
   templateUrl: './choose-room.component.html',
-  styleUrls: ['./choose-room.component.css']
+  styleUrls: ['./choose-room.component.css'],
 })
 export class ChooseRoomComponent implements OnInit{
   rooms: any[] = [];
@@ -17,7 +17,6 @@ export class ChooseRoomComponent implements OnInit{
     this.gameService.socket.emit('room list');
     this.gameService.socket.on('room list', (rooms: any[]) => {
       this.rooms = rooms;
-      console.log(this.rooms);
     });
   }
 
@@ -28,7 +27,6 @@ export class ChooseRoomComponent implements OnInit{
       this.gameService.socket.emit('join room', String(JSON.parse(user).id));
       this.gameService.socket.on('message', (message: String) => {
         if (message === 'success') {
-          localStorage.setItem('room', String(JSON.parse(user).id));
           this.router.navigate(['/choose-character']);
         }
         else {
@@ -45,7 +43,6 @@ export class ChooseRoomComponent implements OnInit{
       this.gameService.socket.emit('join room', room);
       this.gameService.socket.on('message', (message : String) => {
         if (message === 'success') {
-          localStorage.setItem('room', room);
           this.router.navigate(['/choose-character']);
         }
         else {

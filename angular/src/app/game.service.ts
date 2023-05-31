@@ -9,39 +9,22 @@ export class GameService {
   socket: any;
   connected: boolean = false;
   inGame: boolean = false;
-  // room:number;
+  // room:number; 由服务器端维护
   updateList: EventEmitter<any> = new EventEmitter<any>();
   gameReady: EventEmitter<any> = new EventEmitter<any>();
 
   constructor(public snackBar:MatSnackBar) {
-    // 连接socket
-    this.socket = io('http://localhost:3000/', {   
-      transports: ['websocket'],
-      upgrade: false
-    });
-    // const storedSocketId = localStorage.getItem('socketId');
-    // if (storedSocketId) {
-    //   console.log(storedSocketId);
-    //   this.socket = io('http://localhost:3000/', {   
-    //     transports: ['websocket'],
-    //     upgrade: false,
-    //     // query : { id: storedSocketId }
-    //   });
-    // }
-    // else {
-    //   this.socket = io('http://localhost:3000/', {   
-    //     transports: ['websocket'],
-    //     upgrade: false
-    //   });
-    //   localStorage.setItem('socketId', this.socket.id);
-    // }
-
-    const room = localStorage.getItem('room');
-    if (room) {
-      this.socket.emit('join room', room);
+    const user = localStorage.getItem('user');
+    if (!user) {
+      return;
     }
 
-    this.socket.on('connect', () => {
+    // 连接socket
+    this.socket = io('http://localhost:3000/', {   
+      query: { userId: JSON.parse(user).id }
+    });
+
+    this.socket.on('connection', () => {
       this.connected = true;
     });
 

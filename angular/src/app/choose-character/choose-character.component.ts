@@ -5,7 +5,7 @@ import {GameService} from "../game.service";
 @Component({
   selector: 'app-choose-character',
   templateUrl: './choose-character.component.html',
-  styleUrls: ['./choose-character.component.css']
+  styleUrls: ['./choose-character.component.css'],
 })
 export class ChooseCharacterComponent implements OnInit,OnDestroy {
   list: any= [
@@ -21,7 +21,7 @@ export class ChooseCharacterComponent implements OnInit,OnDestroy {
   choosing: boolean = true;
   choice: any;
 
-  constructor(private router: Router, private gameService:GameService) {}
+  constructor(private router: Router, private gameService: GameService) {}
 
   ngOnInit(): void {
     this.gameService.updateList.subscribe((res:any)=>{
@@ -48,10 +48,14 @@ export class ChooseCharacterComponent implements OnInit,OnDestroy {
   }
 
   leaveRoom() {
-    const room = localStorage.getItem('room');
-    if (room) {
-      this.gameService.socket.emit('leave room', room);
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.gameService.socket.emit('leave room', String(JSON.parse(user).id));
+      this.gameService.socket.on('leave room', ()=>{
+        this.router.navigate(['/choose-room']).then(()=>{
+          location.reload();
+        });
+      });
     }
-    localStorage.removeItem('room');
   }
 }
