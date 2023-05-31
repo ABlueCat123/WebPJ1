@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  private url = "http://localhost:8081/login";
+  private readonly url = "http://localhost:8081/login";
 
   constructor(public http:HttpClient, private router: Router) {}
 

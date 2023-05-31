@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  private url = "http://localhost:8081/register";
+  private readonly url = "http://localhost:8081/register";
 
   constructor(public http:HttpClient, private router: Router) {}
 
