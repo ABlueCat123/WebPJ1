@@ -17,5 +17,5 @@ public class Question {
     private String B;
     private String C;
     private String D;
-    private Long answer;
+    private String answer;
 }
