@@ -1,5 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from "@angular/router";
+import { Component } from '@angular/core';
 import { GameService } from '../game.service';
 
 @Component({
@@ -7,28 +6,24 @@ import { GameService } from '../game.service';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, OnDestroy {
-  text: string = '';
+export class ChatComponent {
   messages: string[] = [];
 
-  constructor(private router: Router, private gameService: GameService) {}
-
-  ngOnInit(): void {
+  constructor(private gameService: GameService) {
     this.gameService.socket.on('chat', (message: string) => {
       console.log(`Received message: ${message}`);
       this.messages.push(message);
+      console.log(this.messages);
     });
   }
 
-  ngOnDestroy(): void {
-    this.gameService.socket.disconnect();
-  }
-
   sendMessage() {
-    if (this.text !== '') {
-      console.log(`Sending message: ${this.text}`);
-      this.gameService.socket.emit('chat', this.text);
-      this.text = '';
+    let text = document.getElementById("chat") as HTMLInputElement | null;
+    const user = localStorage.getItem('user');
+    if (text && text.value && user) {
+      console.log(`Sending message: ${text.value}`);
+      this.gameService.socket.emit('chat', String(JSON.parse(user).username) + ': ' + text.value);
+      text.value = '';
     }
   }
 }

@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
     });
     socket.on('chat', (message) => {
         console.log(`Received message: ${message}`);
-        socket.broadcast.to(socket.rooms).emit('chat', message);
+        socket.broadcast.to(UserRoomMap.get(userId)).emit('chat', message);
     });
 
     socket.on("characters", (callback) => {

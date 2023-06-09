@@ -1,7 +1,11 @@
-<h1>Chat Room</h1>
+<div style="position: absolute; top: 0; left: 0; opacity: 0.7; background-color: darkgray;">
 
-<div *ngFor="let message of messages">
-    {{ message }}
+    <div style="width: 400px; height: 300px; overflow: auto;">
+        <div *ngFor="let message of messages">
+            {{ message }}
+        </div>
+    </div>
+    
+    <input (keyup.enter)="sendMessage()" id="chat" placeholder="Type your message here...">
+    
 </div>
-
-<input (keyup.enter)="sendMessage()" placeholder="Type your message here...">
