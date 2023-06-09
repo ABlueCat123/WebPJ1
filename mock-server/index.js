@@ -16,43 +16,46 @@ httpServer.listen(3000, () => {
     console.log('listening on *:3000');
 });
 
-let characterList = [
-    {
-        name: "policeman",
-        chosen: false
-    },
-    {
-        name: "thief",
-        chosen: false
-    }
-]
+class RoomInfo {
+    characterList = [
+        {
+            name: "policeman",
+            chosen: false
+        },
+        {
+            name: "thief",
+            chosen: false
+        }
+    ]
+    
+    playerList = [
+        {
+            name: 'policeman',
+            userId: 'test1',
+            position: {},
+            grabTime: '',
+            online: true
+        },
+        {
+            name: 'thief',
+            userId: 'test2',
+            position: {},
+            grabTime: '',
+            online: true
+        }
+    ]
+    
+    currentQuestion;
+    gameTimer;
+    grabTimer;
+}
 
-let playerList = [
-    {
-        name: 'policeman',
-        userId: 'test1',
-        position: {},
-        grabTime: '',
-        online: true
-    },
-    {
-        name: 'thief',
-        userId: 'test2',
-        position: {},
-        grabTime: '',
-        online: true
-    }
-]
-let currentQuestion;
-let gameTimer;
-let grabTimer;
-
-let UserRoomMap = new Map();
+let UserRoomMap = new Map(); // userId --> room
+let RoomInfoMap = new Map(); // room --> RoomInfo
 
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
     socket.leave(socket.id);
-    // socket.join('debug! do not choose this'); // just for debug
     if (UserRoomMap.get(userId)) {
         socket.join(UserRoomMap.get(userId));
     }
@@ -70,13 +73,18 @@ io.on("connection", (socket) => {
 
     socket.on('join room', (room) => {
         console.log('join room');
-        if (io.sockets.adapter.rooms.get(room) == undefined || io.sockets.adapter.rooms.get(room).size < 2) {
+        if (io.sockets.adapter.rooms.get(room) == undefined) {
             socket.join(room);
             socket.emit('message', `success`);
             console.log(`User ${socket.id} joined room ${room}`);
             UserRoomMap.set(userId, room);
-        }
-        else {
+            RoomInfoMap.set(room, new RoomInfo());
+        } else if (io.sockets.adapter.rooms.get(room).size < 2) {
+            socket.join(room);
+            socket.emit('message', `success`);
+            console.log(`User ${socket.id} joined room ${room}`);
+            UserRoomMap.set(userId, room);
+        } else {
             socket.emit('message', `the room ${room} is full`);
             console.log(`the room ${room} is full`);
         }
@@ -86,6 +94,9 @@ io.on("connection", (socket) => {
         UserRoomMap.delete(userId);
         socket.leave(room);
         socket.emit('leave room');
+        if (io.sockets.adapter.rooms.get(room) == undefined || io.sockets.adapter.rooms.get(room).size == 0) {
+            RoomInfoMap.delete(room);
+        }
     });
     socket.on('chat', (message) => {
         console.log(`Received message: ${message}`);
@@ -93,9 +104,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("characters", (callback) => {
-        callback({data: characterList})
+        if (UserRoomMap.get(userId)) {
+            let characterList = (RoomInfoMap.get(UserRoomMap.get(userId))).characterList;
+            callback({data: characterList})
+        }
     })
     socket.on('choose character', (choice) => {
+        let characterList = RoomInfoMap.get(UserRoomMap.get(userId)).characterList;
         for (let element of characterList)
             if (element.name === choice)
                 element.chosen = true;
@@ -105,15 +120,13 @@ io.on("connection", (socket) => {
                 ready = false;
         console.log(characterList)
         if (ready) {
-            socket.emit("ready")
-            socket.broadcast.emit("ready")
-            gameTimer = setTimeout(() => {
+            socket.broadcast.to(UserRoomMap.get(userId)).emit("ready")
+            RoomInfoMap.get(UserRoomMap.get(userId)).gameTimer = setTimeout(() => {
                 let result = {
                     winner: 'thief',
                     message: "Time is over. The thief has won!"
                 }
-                socket.emit("game over", result)
-                socket.broadcast.emit("game over", result)
+                socket.broadcast.to(UserRoomMap.get(userId)).emit("game over", result)
                 
                 try {
                     const roomId = UserRoomMap.get(userId);
@@ -164,26 +177,32 @@ io.on("connection", (socket) => {
     })
 
     socket.on("update", data => {
-        playerList.forEach(player => {
+        if (!UserRoomMap.get(userId)) {
+            return;
+        }
+        RoomInfoMap.get(UserRoomMap.get(userId)).playerList.forEach(player => {
             if (player.name === data.name) {
                 player.position = data.pos
             }
         })
-        socket.broadcast.emit("player state", playerList)
+        let playerList = RoomInfoMap.get(UserRoomMap.get(userId)).playerList;
+        socket.broadcast.to(UserRoomMap.get(userId)).emit("player state", playerList)
         let pos1 = playerList[0].position
         let pos2 = playerList[1].position
         if ((pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2 <= 600 ** 2) {
-            socket.emit("catchable");
-            socket.broadcast.emit("catchable");
+            socket.broadcast.to(UserRoomMap.get(userId)).emit("catchable");
         }
     })
 
     socket.on("question request", () => {
+        if (!UserRoomMap.get(userId)) {
+            return;
+        }
         try {
             const response = axios.get('http://localhost:8081/question/getOne')
                 .then(response => {
                     const data = response.data
-                    currentQuestion = {
+                    RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion = {
                         body: data.description,
                         choices: {
                             A: data.a,
@@ -196,8 +215,7 @@ io.on("connection", (socket) => {
                         grabbed: false,
                         grabber: ''
                     }
-                    socket.emit("question", currentQuestion);
-                    socket.broadcast.emit("question", currentQuestion);
+                    socket.broadcast.to(UserRoomMap.get(userId)).emit("question", RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion);
                     // grabTimer=setTimeout(()=>{
                     //     let msg="Grab timeout, the answer is "+currentQuestion.answer+'.'
                     //     socket.emit("grab timeout",msg)
@@ -213,15 +231,16 @@ io.on("connection", (socket) => {
 
 
     socket.on("grab", (character, callback) => {
-        clearTimeout(grabTimer)
-        if (currentQuestion.grabbed === false) {
-            currentQuestion.grabbed = true;
-            currentQuestion.grabber = character
+        clearTimeout(RoomInfoMap.get(UserRoomMap.get(userId)).grabTimer);
+        if (RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion.grabbed === false) {
+            RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion.grabbed = true;
+            RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion.grabber = character
             callback(true)
         } else
             callback(false)
     })
     socket.on("right answer", () => {
+        let currentQuestion = RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion;
         let msg = currentQuestion.grabber + " answered right.\n" +
             " The answer is " + currentQuestion.answer + '.\n' +
             'The ' + currentQuestion.grabber + " can take a move now."
@@ -230,11 +249,10 @@ io.on("connection", (socket) => {
             answerer: currentQuestion.grabber,
             message: msg
         }
-        socket.emit("answered", data)
-        socket.broadcast.emit("answered", data)
-
+        socket.broadcast.to(UserRoomMap.get(userId)).emit("answered", data)
     })
     socket.on("wrong answer", () => {
+        let currentQuestion = RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion;
         let msg = currentQuestion.grabber + " answered wrong.\n" +
             " Now side changes."
         let data = {
@@ -242,12 +260,12 @@ io.on("connection", (socket) => {
             answerer: currentQuestion.grabber,
             message: msg
         }
-        socket.emit("answered", data)
-        socket.broadcast.emit("answered", data)
+        socket.broadcast.to(UserRoomMap.get(userId)).emit("answered", data)
+
         if (currentQuestion.grabber === 'policeman')
-            currentQuestion.grabber = 'thief'
+        RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion.grabber = 'thief'
         else if (currentQuestion.grabber === 'thief')
-            currentQuestion.grabber = 'policeman'
+        RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion.grabber = 'policeman'
     })
     socket.on("catch", () => {
         let result = {
@@ -255,8 +273,7 @@ io.on("connection", (socket) => {
             message: "The policeman has caught the thief.\n" +
                 "The policeman has won!"
         }
-        socket.emit("game over", result)
-        socket.broadcast.emit("game over", result)
+        socket.broadcast.to(UserRoomMap.get(userId)).emit("game over", result)
 
         try {
             const roomId = UserRoomMap.get(userId);

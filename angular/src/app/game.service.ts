@@ -32,12 +32,6 @@ export class GameService {
       this.inGame=true;
       this.gameReady.emit(null);
     })
-
-    setInterval(()=>{
-      this.socket.emit("characters", (res: any) => {
-        this.updateList.emit(res.data)
-      })
-    },400)
   }
 
   chooseCharacter(choice: string) {

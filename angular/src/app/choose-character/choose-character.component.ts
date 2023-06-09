@@ -24,6 +24,12 @@ export class ChooseCharacterComponent implements OnInit,OnDestroy {
   constructor(private router: Router, private gameService: GameService) {}
 
   ngOnInit(): void {
+    setInterval(()=>{
+      this.gameService.socket.emit("characters", (res: any) => {
+        this.gameService.updateList.emit(res.data)
+      })
+    },400)
+
     this.gameService.updateList.subscribe((res:any)=>{
       this.list=res
     })
