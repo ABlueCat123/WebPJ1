@@ -1,6 +1,7 @@
 import {createServer} from "http";
 import {Server} from "socket.io";
 import axios from "axios";
+import { assert } from "console";
 
 // $env:DEBUG='app';nodemon ./index.js
 
@@ -51,7 +52,7 @@ let UserRoomMap = new Map();
 io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
     socket.leave(socket.id);
-    socket.join('debug! do not choose this'); // just for debug
+    // socket.join('debug! do not choose this'); // just for debug
     if (UserRoomMap.get(userId)) {
         socket.join(UserRoomMap.get(userId));
     }
@@ -113,6 +114,51 @@ io.on("connection", (socket) => {
                 }
                 socket.emit("game over", result)
                 socket.broadcast.emit("game over", result)
+                
+                try {
+                    const roomId = UserRoomMap.get(userId);
+                    let anotherUserId = null;
+                    UserRoomMap.forEach((value, key) => {
+                      if (value === roomId && key !== userId) {
+                        anotherUserId = key;
+                      }
+                    });
+                    assert(anotherUserId != null);
+                    let record = null;
+                    if (choice === 'policeman') {
+                        axios.post('http://localhost:8081/record/add',
+                            {
+                                "policeId": userId,
+                                "thiefId": anotherUserId,
+                                "startTime": null,
+                                "time": null,
+                                "winnerRole": "thief"
+                            }, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                            }).then(response => {
+                                console.log(response.data);
+                            });
+                    } else {
+                        axios.post('http://localhost:8081/record/add',
+                        {
+                            "policeId": anotherUserId,
+                            "thiefId": userId,
+                            "startTime": null,
+                            "time": null,
+                            "winnerRole": "thief"
+                        }, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                        }).then(response => {
+                            console.log(response.data);
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
             }, 60 * 10 * 1000)
         }
     })
@@ -145,7 +191,7 @@ io.on("connection", (socket) => {
                             C: data.c,
                             D: data.d
                         },
-                        answer: data.answer === 1 ? 'A' : data.answer === 2 ? 'B' : data.answer === 3 ? 'C' : 'D',
+                        answer: data.answer,
                         time: new Date().getTime(),
                         grabbed: false,
                         grabber: ''
@@ -211,6 +257,33 @@ io.on("connection", (socket) => {
         }
         socket.emit("game over", result)
         socket.broadcast.emit("game over", result)
+
+        try {
+            const roomId = UserRoomMap.get(userId);
+            let anotherUserId = null;
+            UserRoomMap.forEach((value, key) => {
+              if (value === roomId && key !== userId) {
+                anotherUserId = key;
+              }
+            });
+            assert(anotherUserId != null);
+            axios.post('http://localhost:8081/record/add', 
+                {
+                    "policeId": userId,
+                    "thiefId": anotherUserId,
+                    "startTime": null,
+                    "time": null,
+                    "winnerRole": "policeman"
+                }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+                }).then(response => {
+                    console.log(response.data);
+                });
+        } catch (error) {
+            console.error(error);
+        }
     })
 })
 

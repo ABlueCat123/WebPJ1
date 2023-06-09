@@ -35,5 +35,5 @@ public class Record {
     private String time;
 
     // 胜利玩家扮演的角色
-    private Long winnerRole;
+    private String winnerRole;
 }

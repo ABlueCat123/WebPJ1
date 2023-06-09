@@ -572,6 +572,12 @@ export class ThreeDComponent implements OnInit {
   registerListenOnGameOver(){
     this.socket.on("game over", (result: any) => {
       this.gameService.showMessage(result.message)
+
+      const user = localStorage.getItem('user');
+      if (user) {
+        this.socket.emit('leave room', String(JSON.parse(user).id));
+      }
+
       let t=setTimeout(()=>{
         this.router.navigate(['menu'])
         clearTimeout(t);

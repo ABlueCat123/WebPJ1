@@ -7,19 +7,17 @@ import { HttpClient, HttpParams } from '@angular/common/http';
   styleUrls: ['./gallery.component.css']
 })
 export class GalleryComponent {
-  private url = "http://localhost:8081/record/getByUser";
+  records: any;
 
-  constructor(public http:HttpClient) {}
-
-  getData() {
+  constructor(public http:HttpClient) {
     const user = localStorage.getItem('user');
     if (user) {
-      const params = new HttpParams().set('userId', JSON.parse(user).id);
-  
-      this.http.get(this.url, {params}).subscribe((response: any) => {
+      let url = "http://localhost:8081/record/getByUser?userId=" + String(JSON.parse(user).id);
+
+      this.http.get(url).subscribe((response: any) => {
         console.log(response);
         if (response) {
-            // TODO: 将数据显示出来
+            this.records = response;
         }
         else {
           window.alert('failed to get data');
