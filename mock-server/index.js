@@ -1,7 +1,7 @@
 import {createServer} from "http";
 import {Server} from "socket.io";
 import axios from "axios";
-import { assert } from "console";
+import { assert, time } from "console";
 
 // $env:DEBUG='app';nodemon ./index.js
 
@@ -48,6 +48,17 @@ class RoomInfo {
     currentQuestion;
     gameTimer;
     grabTimer;
+
+    startTime;  // 开始时间
+    time = 0;   // 持续时间，单位s
+    timerId = null;
+
+    startTimer() {
+        this.time = 0;
+        this.timerId = setInterval(() => {
+            this.time++;
+        }, 1000);
+    }
 }
 
 let UserRoomMap = new Map(); // userId --> room
@@ -120,8 +131,12 @@ io.on("connection", (socket) => {
                 ready = false;
         console.log(characterList)
         if (ready) {
-            socket.broadcast.to(UserRoomMap.get(userId)).emit("ready")
+            socket.broadcast.to(UserRoomMap.get(userId)).emit("ready");
+            RoomInfoMap.get(UserRoomMap.get(userId)).startTime = new Date();
+            RoomInfoMap.get(UserRoomMap.get(userId)).startTimer();
             RoomInfoMap.get(UserRoomMap.get(userId)).gameTimer = setTimeout(() => {
+                clearTimeout(RoomInfoMap.get(UserRoomMap.get(userId)).gameTimer);
+                clearInterval(RoomInfoMap.get(UserRoomMap.get(userId)).timerId);
                 let result = {
                     winner: 'thief',
                     message: "Time is over. The thief has won!"
@@ -137,14 +152,13 @@ io.on("connection", (socket) => {
                       }
                     });
                     assert(anotherUserId != null);
-                    let record = null;
                     if (choice === 'policeman') {
                         axios.post('http://localhost:8081/record/add',
                             {
                                 "policeId": userId,
                                 "thiefId": anotherUserId,
-                                "startTime": null,
-                                "time": null,
+                                "startTime": RoomInfoMap.get(UserRoomMap.get(userId)).startTime,
+                                "time": String(RoomInfoMap.get(UserRoomMap.get(userId)).time) + "s",
                                 "winnerRole": "thief"
                             }, {
                             headers: {
@@ -155,24 +169,24 @@ io.on("connection", (socket) => {
                             });
                     } else {
                         axios.post('http://localhost:8081/record/add',
-                        {
-                            "policeId": anotherUserId,
-                            "thiefId": userId,
-                            "startTime": null,
-                            "time": null,
-                            "winnerRole": "thief"
-                        }, {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                        }).then(response => {
-                            console.log(response.data);
-                        });
+                            {
+                                "policeId": anotherUserId,
+                                "thiefId": userId,
+                                "startTime": RoomInfoMap.get(UserRoomMap.get(userId)).startTime,
+                                "time": String(RoomInfoMap.get(UserRoomMap.get(userId)).time) + "s",
+                                "winnerRole": "thief"
+                            }, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                            }).then(response => {
+                                console.log(response.data);
+                            });
                     }
                 } catch (error) {
                     console.error(error);
                 }
-            }, 60 * 10 * 1000)
+            }, 60 * 1000) // 10分钟
         }
     })
 
@@ -268,6 +282,9 @@ io.on("connection", (socket) => {
         RoomInfoMap.get(UserRoomMap.get(userId)).currentQuestion.grabber = 'policeman'
     })
     socket.on("catch", () => {
+        clearTimeout(RoomInfoMap.get(UserRoomMap.get(userId)).gameTimer);
+        clearInterval(RoomInfoMap.get(UserRoomMap.get(userId)).timerId);
+
         let result = {
             winner: 'policeman',
             message: "The policeman has caught the thief.\n" +
@@ -288,8 +305,8 @@ io.on("connection", (socket) => {
                 {
                     "policeId": userId,
                     "thiefId": anotherUserId,
-                    "startTime": null,
-                    "time": null,
+                    "startTime": RoomInfoMap.get(UserRoomMap.get(userId)).startTime,
+                    "time": String(RoomInfoMap.get(UserRoomMap.get(userId)).time) + "s",
                     "winnerRole": "policeman"
                 }, {
                 headers: {
