@@ -12,7 +12,6 @@ import {LoginComponent} from './login/login.component';
 import {RegisterComponent} from './register/register.component';
 import {SelfInfoComponent} from './self-info/self-info.component';
 import {GalleryComponent} from './gallery/gallery.component';
-import {SettingsComponent} from './settings/settings.component';
 import {ChooseRoomComponent} from './choose-room/choose-room.component';
 import {ChooseCharacterComponent} from './choose-character/choose-character.component';
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
@@ -32,7 +31,6 @@ const appRoutes: Routes = [
   {path: 'choose-character', component: ChooseCharacterComponent},
   {path: 'self-info', component: SelfInfoComponent},
   {path: 'gallery', component: GalleryComponent},
-  {path: 'settings', component: SettingsComponent},
   {path: 'main', component: ThreeDComponent},
   {path: '**', redirectTo: '', pathMatch: 'full'},
 ]
@@ -46,7 +44,6 @@ const appRoutes: Routes = [
     RegisterComponent,
     SelfInfoComponent,
     GalleryComponent,
-    SettingsComponent,
     ChooseRoomComponent,
     ChooseCharacterComponent,
     ThreeDComponent,

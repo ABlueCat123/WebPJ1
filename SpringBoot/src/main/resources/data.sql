@@ -1,1 +1,9 @@
 INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('1', '2', '3', '4', 'B', '1+1');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('2', '4', '6', '8', 'B', '2+2');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('3', '4', '5', '6', 'D', '3+3');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('4', '6', '8', '10', 'C', '4+4');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('10', '12', '8', '5', 'A', '5+5');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('10', '20', '12', '6', 'C', '6+6');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('11', '12', '13', '14', 'D', '7+7');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('11', '21', '16', '14', 'C', '8+8');
+INSERT IGNORE INTO question (a, b, c, d, answer, description) VALUES ('18', '21', '9', '19', 'A', '9+9');
