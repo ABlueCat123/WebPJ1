@@ -50,7 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addUser(User user) {
-        return userDao.save(user);
+        if (findUserByUsername(user.getUsername()) == null)return userDao.save(user);
+        return null;
     }
 
     @Override
